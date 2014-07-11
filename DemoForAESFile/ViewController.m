@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "AESCrypt.h"
+#import "AESCrypt+FileCrypt.h"
 
 #define PATH_DOC [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES) objectAtIndex:0]
 

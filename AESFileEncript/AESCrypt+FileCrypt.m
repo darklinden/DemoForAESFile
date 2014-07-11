@@ -6,7 +6,7 @@
 //  Copyright (c) 2011 darklinden. All rights reserved.
 //
 
-#import "AESCrypt.h"
+#import "AESCrypt+FileCrypt.h"
 #import "aes.h"
 #import "evp.h"
 #import "sha.h"
@@ -18,7 +18,7 @@
 
 #define _LARGE_FILES
 
-@implementation AESCrypt
+@implementation AESCrypt (FileCrypt)
 
 + (BOOL)AESEncrypyFile:(NSString*)src toFile:(NSString*)des withKey:(NSString*)strkey
 {
@@ -54,10 +54,10 @@
     
     memset(iv, 0x0, 16); 
     
-    while( (len = fread(buffer_in, sizeof(unsigned char), 256, file_src)) == 256)
+    while( (len = (int)fread(buffer_in, sizeof(unsigned char), 256, file_src)) == 256)
     {
         AES_cbc_encrypt(buffer_in, buffer_out, len, &key, iv, AES_ENCRYPT);
-        len = fwrite(buffer_out, sizeof(unsigned char), len, file_des);    
+        len = (int)fwrite(buffer_out, sizeof(unsigned char), len, file_des);
         if(len < 0)
         {
             return NO;
@@ -70,7 +70,7 @@
         ret = len;
         len = (len & 0xFFFFFFF0) + ((len & 0x0F) ? 16 : 0);
         *(buffer_out + len) = (len - ret);
-        len = fwrite(buffer_out, sizeof(unsigned char), len + 1, file_des);
+        len = (int)fwrite(buffer_out, sizeof(unsigned char), len + 1, file_des);
         if(len < 0)
         {
             return NO;
@@ -86,7 +86,7 @@
     
     AES_cbc_encrypt(fappen_in, fappen_out, 16, &key, fappen_iv, AES_ENCRYPT);
     
-    len = fwrite(fappen_out, sizeof(unsigned char), 32, file_des);
+    len = (int)fwrite(fappen_out, sizeof(unsigned char), 32, file_des);
     if(len < 0)
     {
         return NO;
@@ -129,13 +129,13 @@
     }
     
     memset(iv, 0x0, 16);
-    len = fread(buffer_in, sizeof(unsigned char), 256, file_src);
+    len = (int)fread(buffer_in, sizeof(unsigned char), 256, file_src);
     while( len == 256)
     {
         unsigned char buffer_in_tmp[256] = {0x0};
         memcpy(buffer_in_tmp, buffer_in, 256);
         
-        ret = fread(buffer_in, sizeof(unsigned char), 256, file_src);
+        ret = (int)fread(buffer_in, sizeof(unsigned char), 256, file_src);
         
 //        printf("buffer_in \n");
 //        for(int i = 0; i < ret; ++i) printf("%02x ", buffer_in[i]);
@@ -168,7 +168,7 @@
             AES_cbc_encrypt(buffer_in_tmp, buffer_out, len, &key, iv, AES_DECRYPT);
         }
         
-        len = fwrite(buffer_out, sizeof(unsigned char), len, file_des);
+        len = (int)fwrite(buffer_out, sizeof(unsigned char), len, file_des);
         if(len < 0)
         {
             return NO;
@@ -181,7 +181,7 @@
         AES_cbc_encrypt(buffer_in, buffer_out, len - 32, &key, iv, AES_DECRYPT);
         len -= (unsigned char)(buffer_in[len - 33]);
         len -= 33;
-        len = fwrite(buffer_out, sizeof(unsigned char), len, file_des);
+        len = (int)fwrite(buffer_out, sizeof(unsigned char), len, file_des);
         if(len < 0)
         {
             return NO;
@@ -211,7 +211,7 @@
     file_src = fopen([filePath UTF8String], "r");
     fseeko(file_src, -32, SEEK_END);
     
-    ret = fread(buffer_in, sizeof(unsigned char), 32, file_src);
+    ret = (int)fread(buffer_in, sizeof(unsigned char), 32, file_src);
     if (ret < 0) return NO;
     len = ret;
     

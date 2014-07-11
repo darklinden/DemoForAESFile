@@ -7,8 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "AESCrypt.h"
 
-@interface AESCrypt : NSObject
+@interface AESCrypt (FileCrypt)
 + (BOOL)AESEncrypyFile:(NSString*)src toFile:(NSString*)des withKey:(NSString*)strkey;
 + (BOOL)AESDecrypyFile:(NSString*)src toFile:(NSString*)des withKey:(NSString*)strkey;
 + (BOOL)AESKey:(NSString*)strKey matchFile:(NSString*)filePath;
